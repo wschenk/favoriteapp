@@ -30,4 +30,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           file: Dockerfile.prod
           build-args:
-            RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+            - RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
