@@ -29,5 +29,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           file: Dockerfile.prod
-          build-args:
-            - RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          build-args: RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }}
