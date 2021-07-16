@@ -1,0 +1,58 @@
+version: "3.7"
+
+services:
+  postgres:
+    image: postgres:13.1
+    environment:
+      POSTGRES_PASSWORD: awesome_password
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:5.4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: SuperSecret
+      GUNICORN_ACCESS_LOGFILE: /dev/null
+    ports:
+      - "4000:80"
+    depends_on:
+      - postgres
+
+  favoriteapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:awesome_password@postgres:5432/favoriteapp?encoding=utf8&pool=5&timeout=5000
+      - REDIS_URL=redis://redis:6379/0
+      - RAILS_ENV=development
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bundle exec sidekiq
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://postgres:awesome_password@postgres:5432/favoriteapp?encoding=utf8&pool=5&timeout=5000
+      - REDIS_URL=redis://redis:6379/0
+      - RAILS_ENV=development
+
+  redis:
+    image: 
+  redis:
+    image: redis:6.0.9
+    ports:
+      - '6379:6379'

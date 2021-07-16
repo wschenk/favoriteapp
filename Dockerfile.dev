@@ -1,0 +1,25 @@
+FROM ruby:3.0.1
+
+WORKDIR /app
+
+# nodejs and yarn and cloc
+RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get update && apt-get install -y nodejs yarn
+
+# install bundler
+RUN gem install bundler:2.1.4
+
+# Bundle gems
+COPY Gemfile* /app/
+RUN bundle install
+
+# Install node stuff
+COPY package.json yarn.lock /app/
+RUN yarn install --check-files
+COPY . /app/
+
+EXPOSE 3000
+
+CMD rm -f tmp/pids/server.pid;bundle exec rails server -b 0.0.0.0
