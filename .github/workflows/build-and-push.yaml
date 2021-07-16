@@ -30,3 +30,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           file: Dockerfile.prod
           build-args: RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }}
+
+      -
+        name: Deploy App
+        id: k8app
+        uses: steebchen/kubectl@v2.0.0
+        with: # defaults to latest kubectl binary version
+         config: ${{ secrets.KUBE_CONFIG_DATA }}
+         command: rollout restart --namespace favoriteapp deployment/favoriteapp
+      -
+        name: Deploy workers
+        id: k8workers
+        uses: steebchen/kubectl@v2.0.0
+        with: # defaults to latest kubectl binary version
+          config: ${{ secrets.KUBE_CONFIG_DATA }}
+          command: rollout restart --namespace favoriteapp deployment/favoriteapp-workers
